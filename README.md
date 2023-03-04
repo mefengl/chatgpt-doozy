@@ -8,3 +8,5 @@ A wonderful day spent with ChatGPT
 ## 知乎
 
 进入知乎问题页面触发
+
+> GitHub: https://github.com/mefengl/a-day-with-chatgpt
