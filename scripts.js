@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         A Day With ChatGPT
 // @namespace    https://github.com/mefengl
-// @version      0.1.2
+// @version      0.2.0
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
 // @match        https://book.douban.com/subject/*
 // @match        https://www.zhihu.com/question/*
+// @match        https://github.com/*
 // @match        https://chat.openai.com/chat
 // @require      https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js
 // @grant        GM_openInTab
@@ -34,6 +35,11 @@
   $(() => location.href.includes("zhihu") && GM_setValue("zhihu", true) && console.log("开启 zhihu 菜单"));
   if (GM_getValue("zhihu") == true) {
     default_menu_all.zhihu = false;
+  }
+  // 使用 github 开启
+  $(() => location.href.includes("github") && GM_setValue("github", true) && console.log("开启 github 菜单"));
+  if (GM_getValue("github") == true) {
+    default_menu_all.github = false;
   }
   // 检查是否有新增菜单
   for (let name in default_menu_all) {
@@ -69,6 +75,20 @@
           // 添加新的
           menu_id[name] = GM_registerMenuCommand(
             " zhihu：" + (value ? "✅" : "❌"),
+            () => {
+              menu_all[name] = !menu_all[name];
+              GM_setValue("menu_all", menu_all);
+              // 调用时触发，刷新菜单
+              update_menu();
+              // 该设置需刷新生效
+              location.reload();
+            }
+          );
+          break;
+        case "github":
+          // 添加新的
+          menu_id[name] = GM_registerMenuCommand(
+            " github：" + (value ? "✅" : "❌"),
             () => {
               menu_all[name] = !menu_all[name];
               GM_setValue("menu_all", menu_all);
@@ -154,6 +174,39 @@
         GM_setValue("prompt_texts", prompt_texts);
       } else { return; }
     }
+  });
+
+  // github
+  const github_prompts = [
+    (website) => `${website}的简要介绍是：`,
+    (website) => `${website}的主要功能列成表格是：`,
+    (website) => `${website}的维护情况是：`,
+    (website) => `${website}的安装方法和最小使用样例是：`,
+    (website) => `${website}的最佳实践是：`,
+    (website) => `${website}的类似项目是：`,
+    (website) => `${website}的不同之处是：`,
+    (website) => `${website}的正面评论是：`,
+    (website) => `${website}的负面评论是：`,
+    (website) => `${website}的相关书籍、文章、视频或网站是：`,
+  ]
+  
+  menu_all.github && $(() => {
+    // github repo?
+    const parts = location.href.split("/");
+    if (parts.length >= 5 && parts[parts.length - 2] && parts[parts.length - 1]) {
+      const github_cache = GM_getValue("github_cache", []);
+      if (!github_cache.some(item => item.website == location.href)) {
+        github_cache.push({ website: location.href });
+        if (github_cache.length > 10) {
+          github_cache.shift();
+        }
+        GM_setValue("github_cache", github_cache);
+      
+        // trigger ChatGPT
+        const prompt_texts = github_prompts.map(prompt => prompt(location.href));
+        GM_setValue("prompt_texts", prompt_texts);
+      } else { return; }
+    } 
   });
 
   /* ************************************************************************* */
