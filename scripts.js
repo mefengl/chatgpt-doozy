@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         A Day With ChatGPT
 // @namespace    https://github.com/mefengl
-// @version      0.0.2
+// @version      0.1.2
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
 // @match        https://book.douban.com/subject/*
+// @match        https://www.zhihu.com/question/*
 // @match        https://chat.openai.com/chat
 // @require      https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js
 // @grant        GM_openInTab
@@ -23,19 +24,23 @@
   const default_menu_all = {
   };
   const menu_all = GM_getValue("menu_all", default_menu_all);
+  // 菜单更新的逻辑
+  // 使用 douban 开启
+  $(() => location.href.includes("book.douban") && GM_setValue("douban-book", true) && console.log("开启 douban读书 菜单"));
+  if (GM_getValue("douban-book") == true) {
+    default_menu_all.douban_book = false;
+  }
+  // 使用 zhihu 开启
+  $(() => location.href.includes("zhihu") && GM_setValue("zhihu", true) && console.log("开启 zhihu 菜单"));
+  if (GM_getValue("zhihu") == true) {
+    default_menu_all.zhihu = false;
+  }
   // 检查是否有新增菜单
   for (let name in default_menu_all) {
     console.log(name);
     if (!(name in menu_all)) {
       menu_all[name] = default_menu_all[name];
     }
-  }
-  // 菜单更新的逻辑
-  // 只对使用 douban 的读书人开启
-  $(() => location.href.includes("book.douban") && GM_setValue("douban-book", true) && console.log("开启 douban读书 菜单"));
-  if (GM_getValue("douban-book") == true) {
-    console.log("开启 douban读书 菜单");
-    default_menu_all.douban_book = false;
   }
   const menu_id = GM_getValue("menu_id", {});
   function update_menu() {
@@ -60,13 +65,30 @@
             }
           );
           break;
+        case "zhihu":
+          // 添加新的
+          menu_id[name] = GM_registerMenuCommand(
+            " zhihu：" + (value ? "✅" : "❌"),
+            () => {
+              menu_all[name] = !menu_all[name];
+              GM_setValue("menu_all", menu_all);
+              // 调用时触发，刷新菜单
+              update_menu();
+              // 该设置需刷新生效
+              location.reload();
+            }
+          );
+          break;
+        default:
+          break;
       }
     };
     GM_setValue("menu_id", menu_id);
   }
   update_menu();
 
-  const prompts = [
+  // douban_book
+  const douban_book_prompts = [
     (title, author) => `${author}的《${title}》简要介绍会是：`,
     (title, author) => `《${title}》的作者${author}简要介绍会是：`,
     (title, author) => `${author}的《${title}》的主要观点列成表格会是：`,
@@ -94,12 +116,47 @@
         GM_setValue("douban_book_cache", douban_book_cache);
 
         // trigger ChatGPT
-        const prompt_texts = prompts.map(prompt => prompt(title, author));
+        const prompt_texts = douban_book_prompts.map(prompt => prompt(title, author));
+        GM_setValue("prompt_texts", prompt_texts);
+      } else { return; }
+    }
+  });
+  
+  // zhihu
+  const zhihu_prompts = [
+    (question) => `问题：${question}，这么问可能会更好：`,
+    (question) => `问题：${question}，暗含的观点是：`,
+    (question) => `问题：${question}，提问者和提问者的目的是：`,
+    (question) => `问题：${question}，问题的相关背景是：`,
+    (question) => `问题：${question}，类似问题和它们的区别会是：`,
+    (question) => `问题：${question}，观点相反的问题和对应的观点会是：`,
+    (question) => `问题：${question}，正面回答会是：`,
+    (question) => `问题：${question}，反面回答会是：`,
+    (question) => `问题：${question}，有趣的回答会是：`,
+    (question) => `问题：${question}，主要观点列成表格会是：`,
+    (question) => `问题：${question}，相关书籍、文章、视频或网站会是：`,
+  ]
+
+  menu_all.zhihu && $(() => {
+    if (location.href.includes("zhihu.com/question")) {
+      const question = $('meta[itemprop="name"]').attr('content');
+      const zhihu_cache = GM_getValue("zhihu_cache", []);
+      // if not in cache, add it, or return
+      if (!zhihu_cache.some(item => item.question == question)) {
+        zhihu_cache.push({ question });
+        if (zhihu_cache.length > 10) {
+          zhihu_cache.shift();
+        }
+        GM_setValue("zhihu_cache", zhihu_cache);
+      
+        // trigger ChatGPT
+        const prompt_texts = zhihu_prompts.map(prompt => prompt(question));
         GM_setValue("prompt_texts", prompt_texts);
       } else { return; }
     }
   });
 
+  /* ************************************************************************* */
   // ChatGPT response to prompt_texts
   const get_submit_button = () => {
     const form = document.querySelector('form');
