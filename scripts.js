@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         A Day With ChatGPT
 // @namespace    https://github.com/mefengl
-// @version      0.2.1
+// @version      0.2.2
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -128,7 +128,8 @@
       const author = $("meta[property='book:author']").attr("content");
       const douban_book_cache = GM_getValue("douban_book_cache", []);
       // if not in cache, add it, or return
-      if (!douban_book_cache.some(item => item.title == title && item.author == author)) {
+      // if (!douban_book_cache.some(item => item.title == title && item.author == author)) {
+      if (true) {
         douban_book_cache.push({ title, author });
         if (douban_book_cache.length > 10) {
           douban_book_cache.shift();
@@ -162,7 +163,8 @@
       const question = $('meta[itemprop="name"]').attr('content');
       const zhihu_cache = GM_getValue("zhihu_cache", []);
       // if not in cache, add it, or return
-      if (!zhihu_cache.some(item => item.question == question)) {
+      // if (!zhihu_cache.some(item => item.question == question)) {
+      if (true) {
         zhihu_cache.push({ question });
         if (zhihu_cache.length > 10) {
           zhihu_cache.shift();
@@ -196,7 +198,8 @@
     const parts = location.href.split("/");
     if (parts.length >= 5 && parts[parts.length - 2] && parts[parts.length - 1]) {
       const github_cache = GM_getValue("github_cache", []);
-      if (!github_cache.some(item => item.website == location.href)) {
+      // if (!github_cache.some(item => item.website == location.href)) {
+      if (true) {
         github_cache.push({ website: location.href });
         if (github_cache.length > 10) {
           github_cache.shift();
