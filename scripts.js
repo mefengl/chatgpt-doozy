@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         A Day With ChatGPT
 // @namespace    https://github.com/mefengl
-// @version      0.2.0
+// @version      0.2.1
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
-// @match        https://book.douban.com/subject/*
-// @match        https://www.zhihu.com/question/*
+// @match        https://book.douban.com/*
+// @match        https://www.zhihu.com/*
 // @match        https://github.com/*
 // @match        https://chat.openai.com/chat
 // @require      https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js
@@ -192,6 +192,7 @@
   
   menu_all.github && $(() => {
     // github repo?
+    if (!location.href.includes("github.com")) { return; }
     const parts = location.href.split("/");
     if (parts.length >= 5 && parts[parts.length - 2] && parts[parts.length - 1]) {
       const github_cache = GM_getValue("github_cache", []);
