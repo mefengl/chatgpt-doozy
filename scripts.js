@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         A Day With ChatGPT
 // @namespace    https://github.com/mefengl
-// @version      0.3.0
+// @version      0.3.1
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -197,7 +197,7 @@
     (question) => `问题：${question}，应该去反思：`,
     (question) => `问题：${question}，想要改进或解决它，可以从这些方面入手：`,
   ]
-  
+
   // // zhihu
   const zhihu_prompts = [...question_prompts];
 
@@ -213,7 +213,7 @@
           zhihu_cache.shift();
         }
         GM_setValue("zhihu_cache", zhihu_cache);
-      
+
         // trigger ChatGPT
         const prompt_texts = zhihu_prompts.map(prompt => prompt(question));
         GM_setValue("prompt_texts", prompt_texts);
@@ -222,12 +222,12 @@
   });
 
   // // hackernews
-  
+
   const hackernews_prompts = [...question_prompts];
-  
+
   menu_all.hackernews && $(() => {
     if (location.href.includes("news.ycombinator.com/item")) {
-      const question = $('a.storylink').text();
+      const question = $('td.title > span.titleline > a').text();
       const hackernews_cache = GM_getValue("hackernews_cache", []);
       // if not in cache, add it, or return
       // if (!hackernews_cache.some(item => item.question == question)) {
@@ -237,7 +237,7 @@
           hackernews_cache.shift();
         }
         GM_setValue("hackernews_cache", hackernews_cache);
-      
+
         // trigger ChatGPT
         const prompt_texts = hackernews_prompts.map(prompt => prompt(question));
         GM_setValue("prompt_texts", prompt_texts);
@@ -266,7 +266,7 @@
     (website) => `我不应该用这个项目，因为：`,
     (website) => `如果我想改进${website}，我可以从这些项目入手：`,
   ]
-  
+
   menu_all.github && $(() => {
     // github repo?
     if (!location.href.includes("github.com")) { return; }
@@ -280,15 +280,15 @@
           github_cache.shift();
         }
         GM_setValue("github_cache", github_cache);
-      
+
         // trigger ChatGPT
         const prompt_texts = github_prompts.map(prompt => prompt(location.href));
         GM_setValue("prompt_texts", prompt_texts);
       } else { return; }
-    } 
+    }
   });
 
-  
+
 
   /* ************************************************************************* */
   // ChatGPT response to prompt_texts
