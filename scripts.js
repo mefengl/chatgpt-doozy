@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         A Day With ChatGPT
 // @namespace    https://github.com/mefengl
-// @version      0.2.3
+// @version      0.3.0
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
 // @match        https://book.douban.com/*
 // @match        https://www.zhihu.com/*
+// @match        https://news.ycombinator.com/*
 // @match        https://github.com/*
 // @match        https://chat.openai.com/chat
 // @require      https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js
@@ -35,6 +36,11 @@
   $(() => location.href.includes("zhihu") && GM_setValue("zhihu", true) && console.log("开启 zhihu 菜单"));
   if (GM_getValue("zhihu") == true) {
     default_menu_all.zhihu = false;
+  }
+  // 使用 hackernews 开启
+  $(() => location.href.includes("news.ycombinator") && GM_setValue("hackernews", true) && console.log("开启 hackernews 菜单"));
+  if (GM_getValue("hackernews") == true) {
+    default_menu_all.hackernews = false;
   }
   // 使用 github 开启
   $(() => location.href.includes("github") && GM_setValue("github", true) && console.log("开启 github 菜单"));
@@ -75,6 +81,20 @@
           // 添加新的
           menu_id[name] = GM_registerMenuCommand(
             " zhihu：" + (value ? "✅" : "❌"),
+            () => {
+              menu_all[name] = !menu_all[name];
+              GM_setValue("menu_all", menu_all);
+              // 调用时触发，刷新菜单
+              update_menu();
+              // 该设置需刷新生效
+              location.reload();
+            }
+          );
+          break;
+        case "hackernews":
+          // 添加新的
+          menu_id[name] = GM_registerMenuCommand(
+            " hackernews：" + (value ? "✅" : "❌"),
             () => {
               menu_all[name] = !menu_all[name];
               GM_setValue("menu_all", menu_all);
@@ -145,9 +165,9 @@
       } else { return; }
     }
   });
-  
-  // zhihu
-  const zhihu_prompts = [
+
+  // question
+  const question_prompts = [
     (question) => `问题：${question}，这么问可能会更好：`,
     (question) => `问题：${question}，暗含的观点是：`,
     (question) => `问题：${question}，提问者和提问者的目的是：`,
@@ -177,6 +197,9 @@
     (question) => `问题：${question}，应该去反思：`,
     (question) => `问题：${question}，想要改进或解决它，可以从这些方面入手：`,
   ]
+  
+  // // zhihu
+  const zhihu_prompts = [...question_prompts];
 
   menu_all.zhihu && $(() => {
     if (location.href.includes("zhihu.com/question")) {
@@ -193,6 +216,30 @@
       
         // trigger ChatGPT
         const prompt_texts = zhihu_prompts.map(prompt => prompt(question));
+        GM_setValue("prompt_texts", prompt_texts);
+      } else { return; }
+    }
+  });
+
+  // // hackernews
+  
+  const hackernews_prompts = [...question_prompts];
+  
+  menu_all.hackernews && $(() => {
+    if (location.href.includes("news.ycombinator.com/item")) {
+      const question = $('a.storylink').text();
+      const hackernews_cache = GM_getValue("hackernews_cache", []);
+      // if not in cache, add it, or return
+      // if (!hackernews_cache.some(item => item.question == question)) {
+      if (true) {
+        hackernews_cache.push({ question });
+        if (hackernews_cache.length > 10) {
+          hackernews_cache.shift();
+        }
+        GM_setValue("hackernews_cache", hackernews_cache);
+      
+        // trigger ChatGPT
+        const prompt_texts = hackernews_prompts.map(prompt => prompt(question));
         GM_setValue("prompt_texts", prompt_texts);
       } else { return; }
     }
@@ -240,6 +287,8 @@
       } else { return; }
     } 
   });
+
+  
 
   /* ************************************************************************* */
   // ChatGPT response to prompt_texts

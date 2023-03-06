@@ -5,11 +5,17 @@ A wonderful day spent with ChatGPT
 
 进入书籍详情页面触发
 
-## 知乎
+## 问答类
+
+### 知乎
 
 进入知乎问题页面触发
 
 > 演示视频: https://www.bilibili.com/video/BV1U54y1u7v7
+
+### HackNews
+
+进入 HackNews 问题页面触发
 
 ## GitHub
 
