@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         A Day With ChatGPT
 // @namespace    https://github.com/mefengl
-// @version      0.3.1
+// @version      0.3.2
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -129,20 +129,13 @@
 
   // douban_book
   const douban_book_prompts = [
-    (title, author) => `${author}的《${title}》简要介绍会是：`,
-    (title, author) => `《${title}》的作者${author}简要介绍会是：`,
     (title, author) => `${author}的《${title}》的主要观点列成表格会是：`,
-    (title, author) => `${author}的《${title}》的类似书籍或文章和它们的区别会是：`,
-    (title, author) => `${author}的《${title}》的观点相反的书籍或文章和对应的观点会是：`,
-    (title, author) => `${author}的《${title}》的正面评论会是：`,
-    (title, author) => `${author}的《${title}》的负面评论会是：`,
+    (title, author) => `${author}的《${title}》比较重要的章节会是：`,
     (title, author) => `${author}的《${title}》在哪些方面是有争议的会是：`,
     (title, author) => `${author}的《${title}》当人们生活在不同的时代时，会有什么不同的观点会是：`,
-    (title, author) => `${author}的《${title}》当人们生活在火星时，会有什么不同的观点会是：`,
     (title, author) => `${author}的《${title}》综合Goodreads评分和豆瓣等各种评分和评价会是：`,
-    (title, author) => `${author}的《${title}》比较重要的章节会是：`,
-    (title, author) => `${author}的《${title}》可以和这些书籍或文章进行比较阅读：`,
-    (title, author) => `${author}的《${title}》可以和这些书籍或文章进行主题阅读：`,
+    (title, author) => `${author}的《${title}》的类似书籍或文章和它们的区别会是：`,
+    (title, author) => `${author}的《${title}》的观点相反的书籍或文章和对应的观点会是：`,
   ]
   // a cache for lastest 10 title-author
   menu_all.douban_book && $(() => {
@@ -168,34 +161,18 @@
 
   // question
   const question_prompts = [
-    (question) => `问题：${question}，这么问可能会更好：`,
     (question) => `问题：${question}，暗含的观点是：`,
+    (question) => `问题：${question}，应该去反思：`,
+    (question) => `问题：${question}，想要改进或解决它，可以从这些方面入手：`,
     (question) => `问题：${question}，提问者和提问者的目的是：`,
-    (question) => `问题：${question}，问题的相关背景是：`,
     (question) => `问题：${question}，问题的相关历史是：`,
-    (question) => `问题：${question}，问题的相关法律是：`,
-    (question) => `问题：${question}，问题的相关政策是：`,
-    (question) => `问题：${question}，问题的相关经济是：`,
-    (question) => `问题：${question}，问题的相关科学是：`,
-    (question) => `问题：${question}，问题的相关文化是：`,
-    (question) => `问题：${question}，问题的责任方是：`,
-    (question) => `问题：${question}，不同的职业对这个问题的看法会是：`,
-    (question) => `问题：${question}，不同的年龄段对这个问题的看法会是：`,
-    (question) => `问题：${question}，不同的性别对这个问题的看法会是：`,
     (question) => `问题：${question}，不同的国家对这个问题的看法会是：`,
-    (question) => `问题：${question}，火星人对这个问题的看法会是：`,
-    (question) => `问题：${question}，在火星上，这个问题：`,
     (question) => `问题：${question}，类似问题和它们的区别会是：`,
     (question) => `问题：${question}，观点相反的问题和对应的观点会是：`,
-    (question) => `问题：${question}，正面回答会是：`,
-    (question) => `问题：${question}，反面回答会是：`,
-    (question) => `问题：${question}，有趣的回答会是：`,
+    (question) => `问题：${question}，幽默的回答会是：`,
     (question) => `问题：${question}，主要观点列成表格会是：`,
     (question) => `问题：${question}，相关书籍、文章、视频或网站会是：`,
     (question) => `从这个问题：${question}，可以引申出这些问题：`,
-    (question) => `问题：${question}，可以和这些问题进行比较阅读：`,
-    (question) => `问题：${question}，应该去反思：`,
-    (question) => `问题：${question}，想要改进或解决它，可以从这些方面入手：`,
   ]
 
   // // zhihu
@@ -247,24 +224,12 @@
 
   // github
   const github_prompts = [
-    (website) => `${website}的简要介绍是：`,
     (website) => `${website}的主要功能列成表格是：`,
-    (website) => `${website}的维护情况是：`,
-    (website) => `${website}的安装方法和最小使用样例是：`,
     (website) => `${website}的最佳实践是：`,
     (website) => `${website}的类似项目是：`,
-    (website) => `${website}的不同之处是：`,
-    (website) => `${website}的正面评论是：`,
-    (website) => `${website}的负面评论是：`,
     (website) => `${website}的相关书籍、文章、视频或网站是：`,
-    (website) => `${website}的上一代项目是：`,
     (website) => `${website}的下一代项目是：`,
     (website) => `${website}的应用场景是：`,
-    (website) => `${website}的不适用场景是：`,
-    (website) => `${website}可以解决的问题是：`,
-    (website) => `我应该用这个项目，因为：`,
-    (website) => `我不应该用这个项目，因为：`,
-    (website) => `如果我想改进${website}，我可以从这些项目入手：`,
   ]
 
   menu_all.github && $(() => {
