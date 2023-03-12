@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doozy (多嘴)
 // @namespace    https://github.com/mefengl
-// @version      0.3.3
+// @version      0.3.4
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -27,26 +27,19 @@
   };
   const menu_all = GM_getValue("menu_all", default_menu_all);
   // 菜单更新的逻辑
-  // 使用 douban 开启
-  $(() => location.href.includes("book.douban") && GM_setValue("douban-book", true) && console.log("开启 douban读书 菜单"));
-  if (GM_getValue("douban-book") == true) {
-    default_menu_all.douban_book = false;
-  }
-  // 使用 zhihu 开启
-  $(() => location.href.includes("zhihu") && GM_setValue("zhihu", true) && console.log("开启 zhihu 菜单"));
-  if (GM_getValue("zhihu") == true) {
-    default_menu_all.zhihu = false;
-  }
-  // 使用 hackernews 开启
-  $(() => location.href.includes("news.ycombinator") && GM_setValue("hackernews", true) && console.log("开启 hackernews 菜单"));
-  if (GM_getValue("hackernews") == true) {
-    default_menu_all.hackernews = false;
-  }
-  // 使用 github 开启
-  $(() => location.href.includes("github") && GM_setValue("github", true) && console.log("开启 github 菜单"));
-  if (GM_getValue("github") == true) {
-    default_menu_all.github = false;
-  }
+  const menus = [
+    { checker: () => location.href.includes("book.douban"), name: "douban_book", value: true },
+    { checker: () => location.href.includes("zhihu"), name: "zhihu", value: true },
+    { checker: () => location.href.includes("news.ycombinator"), name: "hackernews", value: true },
+    { checker: () => location.href.includes("github"), name: "github", value: true },
+  ];
+
+  menus.forEach(menu => {
+    $(() => menu.checker() && GM_setValue(menu.name, true) && console.log(`开启 ${menu.name} 菜单`));
+    if (GM_getValue(menu.name) == true) {
+      default_menu_all[menu.name] = menu.value;
+    }
+  });
   // 检查是否有新增菜单
   for (let name in default_menu_all) {
     console.log(name);
