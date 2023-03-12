@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doozy (多嘴)
 // @namespace    https://github.com/mefengl
-// @version      0.3.4
+// @version      0.3.5
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -40,83 +40,34 @@
       default_menu_all[menu.name] = menu.value;
     }
   });
+
   // 检查是否有新增菜单
   for (let name in default_menu_all) {
-    console.log(name);
     if (!(name in menu_all)) {
       menu_all[name] = default_menu_all[name];
     }
   }
   const menu_id = GM_getValue("menu_id", {});
+
+  function registerMenuCommand(name, value) {
+    const menuText = ` ${name}：${value ? '✅' : '❌'}`;
+    const commandCallback = () => {
+      menu_all[name] = !menu_all[name];
+      GM_setValue('menu_all', menu_all);
+      update_menu();
+      location.reload();
+    };
+    return GM_registerMenuCommand(menuText, commandCallback);
+  }
   function update_menu() {
     for (let name in menu_all) {
       const value = menu_all[name];
-      // 卸载原来的
       if (menu_id[name]) {
         GM_unregisterMenuCommand(menu_id[name]);
       }
-      switch (name) {
-        case "douban_book":
-          // 添加新的
-          menu_id[name] = GM_registerMenuCommand(
-            " douban读书：" + (value ? "✅" : "❌"),
-            () => {
-              menu_all[name] = !menu_all[name];
-              GM_setValue("menu_all", menu_all);
-              // 调用时触发，刷新菜单
-              update_menu();
-              // 该设置需刷新生效
-              location.reload();
-            }
-          );
-          break;
-        case "zhihu":
-          // 添加新的
-          menu_id[name] = GM_registerMenuCommand(
-            " zhihu：" + (value ? "✅" : "❌"),
-            () => {
-              menu_all[name] = !menu_all[name];
-              GM_setValue("menu_all", menu_all);
-              // 调用时触发，刷新菜单
-              update_menu();
-              // 该设置需刷新生效
-              location.reload();
-            }
-          );
-          break;
-        case "hackernews":
-          // 添加新的
-          menu_id[name] = GM_registerMenuCommand(
-            " hackernews：" + (value ? "✅" : "❌"),
-            () => {
-              menu_all[name] = !menu_all[name];
-              GM_setValue("menu_all", menu_all);
-              // 调用时触发，刷新菜单
-              update_menu();
-              // 该设置需刷新生效
-              location.reload();
-            }
-          );
-          break;
-        case "github":
-          // 添加新的
-          menu_id[name] = GM_registerMenuCommand(
-            " github：" + (value ? "✅" : "❌"),
-            () => {
-              menu_all[name] = !menu_all[name];
-              GM_setValue("menu_all", menu_all);
-              // 调用时触发，刷新菜单
-              update_menu();
-              // 该设置需刷新生效
-              location.reload();
-            }
-          );
-          break;
-        default:
-          break;
-      }
-    };
-    GM_setValue("menu_id", menu_id);
+      menu_id[name] = registerMenuCommand(name, value);
+    }
+    GM_setValue('menu_id', menu_id);
   }
   update_menu();
 
