@@ -1,4 +1,5 @@
-# a-day-with-chatgpt
+# Doozy (多嘴)
+
 A wonderful day spent with ChatGPT
 
 ## 豆瓣
@@ -21,6 +22,6 @@ A wonderful day spent with ChatGPT
 
 进入 GitHub 仓库页面触发
 
-> GitHub: https://github.com/mefengl/a-day-with-chatgpt
-
-> Greasy Fork: https://greasyfork.org/zh-CN/scripts/461179-a-day-with-chatgpt
+> GitHub: https://github.com/mefengl/Doozy
+>
+> Greasy Fork: https://greasyfork.org/zh-CN/scripts/461179

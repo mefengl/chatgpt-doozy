@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         A Day With ChatGPT
+// @name         Doozy (多嘴)
 // @namespace    https://github.com/mefengl
-// @version      0.3.2
+// @version      0.3.3
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
