@@ -1,15 +1,13 @@
 // ==UserScript==
 // @name         Doozy (多嘴)
 // @namespace    https://github.com/mefengl
-// @version      0.3.6
+// @version      0.4.0
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
-// @match        https://book.douban.com/*
-// @match        https://www.zhihu.com/*
-// @match        https://news.ycombinator.com/*
-// @match        https://github.com/*
 // @match        https://chat.openai.com/chat
+// @match        http://*/*
+// @match        https://*/*
 // @require      https://cdn.staticfile.org/jquery/3.6.1/jquery.min.js
 // @grant        GM_openInTab
 // @grant        GM_registerMenuCommand
@@ -32,6 +30,7 @@
     { checker: () => location.href.includes("zhihu"), name: "zhihu", value: true },
     { checker: () => location.href.includes("news.ycombinator"), name: "hackernews", value: true },
     { checker: () => location.href.includes("github"), name: "github", value: true },
+    { checker: () => location.href.includes("wikipedia"), name: "wikipedia", value: true },
   ];
 
   menus.forEach(menu => {
@@ -148,6 +147,21 @@
       },
       prompts: github_prompts
     },
+    {
+      checker: () => menu_all.wikipedia && location.href.includes("wikipedia.org/wiki/"),
+      prepare: () => {
+        const title = $("h1#firstHeading").text();
+        const summary = $("div.mw-parser-output p").first().text();
+        return { title, summary };
+      },
+      prompts: [
+        ({ title }) => `${title}的历史和重要事件有哪些？`,
+        ({ title }) => `${title}与其他相关主题的比较和对比会是：`,
+        ({ title }) => `${title}的主要观点列成表格会是：`,
+        ({ title, summary }) => `${title}的关键概念和术语是什么？`,
+        ({ title }) => `${title}的类似词条或相关研究和它们的区别会是：`,
+      ]
+    }
   ];
 
   triggers.forEach(trigger => {
