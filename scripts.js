@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doozy (多嘴)
 // @namespace    https://github.com/mefengl
-// @version      0.5.2
+// @version      0.6.0
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -32,6 +32,8 @@
     { checker: () => location.href.includes("github"), name: "github", value: true },
     { checker: () => location.href.includes("wikipedia"), name: "wikipedia", value: true },
     { checker: () => location.href.includes("nytimes.com"), name: "nytimes", value: true },
+    { checker: () => location.href.includes("baidu.com"), name: "baidu", value: true },
+    { checker: () => location.href.includes("reddit.com"), name: "reddit", value: true },
   ];
 
   menus.forEach(menu => {
@@ -168,6 +170,35 @@
         return { question: articleTitle };
       },
       prompts: [...question_prompts]
+    },
+    {
+      checker: () => menu_all.baidu && location.href.includes("www.baidu.com/s"),
+      prepare: () => {
+        const keyword = $("input#kw").val();
+        return { keyword };
+      },
+      prompts: [
+        ({ keyword }) => `关于"${keyword}"的最新新闻有哪些？`,
+        ({ keyword }) => `"${keyword}"的定义和解释是什么？`,
+        ({ keyword }) => `对于"${keyword}"这个话题，你有什么观点或看法？`,
+        ({ keyword }) => `跟"${keyword}"相关的人物或事件有哪些？`,
+        ({ keyword }) => `最近跟"${keyword}"相关的热门话题是什么？`,
+      ]
+    },
+    {
+      checker: () => menu_all.reddit && location.href.includes("reddit.com"),
+      prepare: () => {
+        const postTitle = $("h1._eYtD2XCVieq6emjKBH3m").text();
+        const postContent = $("div._3W_31WoaKsKsZfNldTiz5M").first().text();
+        return { postTitle, postContent };
+      },
+      prompts: [
+        ({ postTitle }) => `关于"${postTitle}"，你有什么想法或评论？`,
+        ({ postTitle }) => `能给大家分享一些"${postTitle}"的相关信息吗？`,
+        ({ postTitle }) => `在"${postTitle}"的讨论中，有哪些观点或意见最值得关注？`,
+        ({ postTitle }) => `对于"${postTitle}"，你的看法是否与其他人不同？`,
+        ({ postTitle }) => `请简要介绍一下"${postTitle}"的主要内容和背景。`,
+      ]
     }
   ];
 
