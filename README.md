@@ -22,6 +22,30 @@ A wonderful day spent with ChatGPT
 
 进入 GitHub 仓库页面触发
 
+## wikipedia
+
+进入 wikipedia 词条页面触发
+
+## nytimes
+
+进入 nytimes 文章页面触发
+
+## baidu
+
+进入 baidu 搜索结果页面触发
+
+## reddit
+
+进入 reddit 文章页面触发
+
+## google
+
+进入 google 搜索结果页面触发
+
+## youtube
+
+进入 youtube 视频页面触发
+
 > GitHub: https://github.com/mefengl/Doozy
 >
 > Greasy Fork: https://greasyfork.org/zh-CN/scripts/461179
