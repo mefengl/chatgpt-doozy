@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doozy (多嘴)
 // @namespace    https://github.com/mefengl
-// @version      0.6.0
+// @version      0.7.2
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -34,6 +34,8 @@
     { checker: () => location.href.includes("nytimes.com"), name: "nytimes", value: true },
     { checker: () => location.href.includes("baidu.com"), name: "baidu", value: true },
     { checker: () => location.href.includes("reddit.com"), name: "reddit", value: true },
+    { checker: () => location.href.includes("google.com"), name: "google", value: true },
+    { checker: () => location.href.includes("youtube.com"), name: "youtube", value: true },
   ];
 
   menus.forEach(menu => {
@@ -198,6 +200,33 @@
         ({ postTitle }) => `在"${postTitle}"的讨论中，有哪些观点或意见最值得关注？`,
         ({ postTitle }) => `对于"${postTitle}"，你的看法是否与其他人不同？`,
         ({ postTitle }) => `请简要介绍一下"${postTitle}"的主要内容和背景。`,
+      ]
+    },
+    {
+      checker: () => menu_all.google && location.href.includes("google.com/search?q="),
+      prepare: () => {
+        const keyword = $("input[name='q']").val();
+        return { keyword };
+      },
+      prompts: [
+        ({ keyword }) => `关于"${keyword}"的最新搜索结果有哪些？`,
+        ({ keyword }) => `对于"${keyword}"这个话题，你有什么观点或看法？`,
+        ({ keyword }) => `跟"${keyword}"相关的人物或事件有哪些？`,
+        ({ keyword }) => `最近跟"${keyword}"相关的热门话题是什么？`,
+      ]
+    },
+    {
+      checker: () => menu_all.youtube && location.href.includes("youtube.com/watch"),
+      prepare: () => {
+        const metaTitle = $('meta[name="title"]').attr('content');
+        return { metaTitle };
+      },
+      prompts: [
+        ({ metaTitle }) => `关于"${metaTitle}"的观点或评论有哪些？`,
+        ({ metaTitle }) => `能给大家分享一些关于"${metaTitle}"的相关信息吗？`,
+        ({ metaTitle }) => `在"${metaTitle}"的讨论中，有哪些观点或意见最值得关注？`,
+        ({ metaTitle }) => `对于"${metaTitle}"，你的看法是否与其他人不同？`,
+        ({ metaTitle }) => `请简要介绍一下"${metaTitle}"的主要内容和背景。`,
       ]
     }
   ];
