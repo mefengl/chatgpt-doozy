@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doozy (多嘴)
 // @namespace    https://github.com/mefengl
-// @version      0.4.0
+// @version      0.5.2
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -31,6 +31,7 @@
     { checker: () => location.href.includes("news.ycombinator"), name: "hackernews", value: true },
     { checker: () => location.href.includes("github"), name: "github", value: true },
     { checker: () => location.href.includes("wikipedia"), name: "wikipedia", value: true },
+    { checker: () => location.href.includes("nytimes.com"), name: "nytimes", value: true },
   ];
 
   menus.forEach(menu => {
@@ -93,8 +94,6 @@
     ({ question }) => `问题：${question}，相关书籍、文章、视频或网站会是：`,
     ({ question }) => `从这个问题：${question}，可以引申出这些问题：`,
   ]
-  const zhihu_prompts = [...question_prompts];
-  const hackernews_prompts = [...question_prompts];
   const github_prompts = [
     ({ website }) => `${website}的主要功能列成表格是：`,
     ({ website }) => `${website}的最佳实践是：`,
@@ -126,7 +125,7 @@
         const question = $('meta[itemprop="name"]').attr('content');
         return { question };
       },
-      prompts: zhihu_prompts
+      prompts: [...question_prompts]
     },
     {
       checker: () => menu_all.hackernews && location.href.includes("news.ycombinator.com/item"),
@@ -134,7 +133,7 @@
         const question = $('td.title > span.titleline > a').text();
         return { question };
       },
-      prompts: hackernews_prompts
+      prompts: [...question_prompts]
     },
     {
       checker: () => menu_all.github && location.href.includes("github.com"),
@@ -158,9 +157,17 @@
         ({ title }) => `${title}的历史和重要事件有哪些？`,
         ({ title }) => `${title}与其他相关主题的比较和对比会是：`,
         ({ title }) => `${title}的主要观点列成表格会是：`,
-        ({ title, summary }) => `${title}的关键概念和术语是什么？`,
+        ({ title }) => `${title}的关键概念和术语是什么？`,
         ({ title }) => `${title}的类似词条或相关研究和它们的区别会是：`,
       ]
+    },
+    {
+      checker: () => menu_all.nytimes && location.href.includes("nytimes.com"),
+      prepare: () => {
+        const articleTitle = $("h1").text();
+        return { question: articleTitle };
+      },
+      prompts: [...question_prompts]
     }
   ];
 
