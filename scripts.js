@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doozy
 // @namespace    https://github.com/mefengl
-// @version      0.7.2
+// @version      0.7.3
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -99,12 +99,9 @@
     ({ question }) => `从这个问题：${question}，可以引申出这些问题：`,
   ]
   const github_prompts = [
-    ({ website }) => `${website}的主要功能列成表格是：`,
     ({ website }) => `${website}的最佳实践是：`,
     ({ website }) => `${website}的类似项目是：`,
     ({ website }) => `${website}的相关书籍、文章、视频或网站是：`,
-    ({ website }) => `${website}的下一代项目是：`,
-    ({ website }) => `${website}的应用场景是：`,
   ]
 
   function chatgpt_trigger(prompt_prepare, prompts) {
