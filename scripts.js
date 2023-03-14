@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Doozy (多嘴)
+// @name         Doozy
 // @namespace    https://github.com/mefengl
 // @version      0.7.2
 // @description  A wonderful day spent with ChatGPT

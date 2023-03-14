@@ -1,4 +1,6 @@
-# Doozy (多嘴)
+# Doozy
+
+> Doozy sounds like 多嘴 in Chinese, which means chatty
 
 A wonderful day spent with ChatGPT
 
