@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Doozy
 // @namespace    https://github.com/mefengl
-// @version      0.7.5
+// @version      0.7.6
 // @description  A wonderful day spent with ChatGPT
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=openai.com
 // @author       mefengl
@@ -38,6 +38,120 @@
       step((generator = generator.apply(__this, __arguments)).next());
     });
   };
+
+  // ../../packages/chatkit/dist/index.mjs
+  function getTextarea() {
+    const form = document.querySelector("form");
+    if (!form)
+      return;
+    const textareas = form.querySelectorAll("textarea");
+    const result = textareas[0];
+    return result;
+  }
+  function getSubmitButton() {
+    const form = document.querySelector("form");
+    if (!form)
+      return;
+    const buttons = form.querySelectorAll("button");
+    const result = buttons[buttons.length - 1];
+    return result;
+  }
+  function getRegenerateButton() {
+    const form = document.querySelector("form");
+    if (!form)
+      return;
+    const buttons = form.querySelectorAll("button");
+    const result = Array.from(buttons).find((button) => {
+      var _a;
+      return (_a = button.textContent) == null ? void 0 : _a.trim().toLowerCase().includes("regenerate");
+    });
+    return result;
+  }
+  function getStopGeneratingButton() {
+    const form = document.querySelector("form");
+    if (!form)
+      return;
+    const buttons = form.querySelectorAll("button");
+    const result = Array.from(buttons).find((button) => {
+      var _a;
+      return (_a = button.textContent) == null ? void 0 : _a.trim().toLowerCase().includes("stop generating");
+    });
+    return result;
+  }
+  function getLastResponseElement() {
+    const responseElements = document.querySelectorAll(".group.w-full");
+    return responseElements[responseElements.length - 1];
+  }
+  function getLastResponse() {
+    const lastResponseElement = getLastResponseElement();
+    if (!lastResponseElement)
+      return;
+    const lastResponse = lastResponseElement.textContent;
+    return lastResponse;
+  }
+  function getTextareaValue() {
+    var _a;
+    return ((_a = getTextarea()) == null ? void 0 : _a.value) || "";
+  }
+  function setTextarea(message) {
+    const textarea = getTextarea();
+    if (!textarea)
+      return;
+    textarea.value = message;
+    textarea.dispatchEvent(new Event("input"));
+  }
+  function send(message) {
+    setTextarea(message);
+    const textarea = getTextarea();
+    if (!textarea)
+      return;
+    textarea.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+  }
+  function regenerate() {
+    const regenerateButton = getRegenerateButton();
+    if (!regenerateButton)
+      return;
+    regenerateButton.click();
+  }
+  function onSend(callback) {
+    const textarea = getTextarea();
+    if (!textarea)
+      return;
+    textarea.addEventListener("keydown", function(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        callback();
+      }
+    });
+    const sendButton = getSubmitButton();
+    if (!sendButton)
+      return;
+    sendButton.addEventListener("mousedown", callback);
+  }
+  function waitForIdle() {
+    return new Promise((resolve) => {
+      const interval = setInterval(() => {
+        if (!getStopGeneratingButton()) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 1e3);
+    });
+  }
+  var chatgpt = {
+    getTextarea,
+    getSubmitButton,
+    getRegenerateButton,
+    getStopGeneratingButton,
+    getLastResponseElement,
+    getLastResponse,
+    getTextareaValue,
+    setTextarea,
+    send,
+    regenerate,
+    onSend,
+    waitForIdle
+  };
+  var chatgpt_default = chatgpt;
 
   // src/index.js
   (function() {
@@ -242,56 +356,28 @@
     triggers.forEach((trigger) => {
       trigger.checker() && chatgpt_trigger(trigger.prepare, trigger.prompts);
     });
-    const get_submit_button = () => {
-      const form = document.querySelector("form");
-      const buttons = form.querySelectorAll("button");
-      const result = buttons[buttons.length - 1];
-      return result;
-    };
-    const get_textarea = () => {
-      const form = document.querySelector("form");
-      const textareas = form.querySelectorAll("textarea");
-      const result = textareas[0];
-      return result;
-    };
-    const get_regenerate_button = () => {
-      const form = document.querySelector("form");
-      const buttons = form.querySelectorAll("button");
-      for (let i = 0; i < buttons.length; i++) {
-        const buttonText = buttons[i].textContent.trim().toLowerCase();
-        if (buttonText.includes("regenerate")) {
-          return buttons[i];
-        }
-      }
-    };
     let last_trigger_time = +/* @__PURE__ */ new Date();
     $(() => {
       if (location.href.includes("chat.openai")) {
-        console.log("ChatGPT");
         GM_addValueChangeListener("prompt_texts", (name, old_value, new_value) => {
           if (+/* @__PURE__ */ new Date() - last_trigger_time < 500) {
             return;
           }
-          last_trigger_time = /* @__PURE__ */ new Date();
+          last_trigger_time = +/* @__PURE__ */ new Date();
           setTimeout(() => __async(this, null, function* () {
-            console.log("ChatGPT\u9875\u9762\u54CD\u5E94prompt_texts");
             const prompt_texts = new_value;
-            console.log(prompt_texts);
             if (prompt_texts.length > 0) {
-              console.log("\u8FDB\u5165\u5904\u7406");
               let firstTime = true;
               while (prompt_texts.length > 0) {
                 if (!firstTime) {
                   yield new Promise((resolve) => setTimeout(resolve, 2e3));
                 }
-                if (!firstTime && get_regenerate_button() == void 0) {
+                if (!firstTime && chatgpt_default.getRegenerateButton() == void 0) {
                   continue;
                 }
                 firstTime = false;
                 const prompt_text = prompt_texts.shift();
-                console.log(prompt_text);
-                get_textarea().value = prompt_text;
-                get_submit_button().click();
+                chatgpt_default.send(prompt_text);
               }
             }
           }), 0);
